@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IrsyadBay</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #0b0b0f;
+    color: #eaeaea;
+}
+
+/* Navbar */
+nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 60px;
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.7);
+    backdrop-filter: blur(10px);
+}
+
+nav h1 {
+    color: #00ffcc;
+}
+
+nav a {
+    color: #aaa;
+    margin-left: 25px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: #00ffcc;
+}
+
+/* Hero */
+.hero {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 60px;
+}
+
+.hero h2 {
+    font-size: 60px;
+    background: linear-gradient(90deg,#00ffcc,#00aaff);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.hero p {
+    max-width: 600px;
+    color: #aaa;
+    margin-top: 20px;
+    line-height: 1.6;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 24px;
+    border: 1px solid #00ffcc;
+    color: #00ffcc;
+    border-radius: 8px;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background: #00ffcc;
+    color: black;
+}
+
+/* Section */
+.section {
+    padding: 100px 60px;
+}
+
+/* Cards */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+    gap: 20px;
+}
+
+.card {
+    background: #111;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #1f1f1f;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    border-color: #00ffcc;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 40px;
+    border-top: 1px solid #1f1f1f;
+    color: #777;
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <h1>0xYourName</h1>
+    <div>
+        <a href="#about">About</a>
+        <a href="#writeups">Writeups</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h2>Web Security Researcher</h2>
+    <p>
+        I analyze web applications, discover vulnerabilities, and document real-world security issues.
+        Focused on bug hunting, exploitation, and understanding how systems break.
+    </p>
+    <a href="#writeups" class="btn">View Writeups</a>
+</section>
+
+<section class="section" id="about">
+    <h2>About Me</h2>
+    <p>
+        I focus on web application security, exploring vulnerabilities such as IDOR,
+        SQL Injection, and misconfigurations. My approach is hands-on, combining labs,
+        CTF challenges, and real-world testing.
+    </p>
+</section>
+
+<section class="section" id="writeups">
+    <h2>Writeups</h2>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Improper Authorization</h3>
+            <p>Bypassing premium access control.</p>
+        </div>
+
+        <div class="card">
+            <h3>SQL Injection</h3>
+            <p>Database exposure via vulnerable parameter.</p>
+        </div>
+
+        <div class="card">
+            <h3>Cloudflare Misconfig</h3>
+            <p>Accessing restricted resources.</p>
+        </div>
+    </div>
+
+</section>
+
+<footer>
+    <p>© 2026 IrsyadBay</p>
+</footer>
+
+</body>
+</html>

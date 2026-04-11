@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Injection - BKD Maluku</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #0b0b0f;
+    color: #eaeaea;
+    line-height: 1.8;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 60px 20px;
+}
+
+h1 {
+    color: #00ffcc;
+}
+
+h2 {
+    margin-top: 50px;
+    color: #00aaff;
+}
+
+p, li {
+    color: #cfcfcf;
+}
+
+.box {
+    background: #111;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #1f1f1f;
+    margin-top: 15px;
+    word-break: break-all;
+}
+
+code {
+    background: #111;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+img {
+    width: 100%;
+    margin-top: 15px;
+    border-radius: 10px;
+    border: 1px solid #222;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 30px;
+    color: #aaa;
+    text-decoration: none;
+}
+
+.back:hover {
+    color: #00ffcc;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<a href="../index.html" class="back">← Back to Home</a>
+
+<h1>SQL Injection pada Situs BKD Maluku Provinsi</h1>
+<p><strong>Irsyad Bayu Kurniawan</strong> — Web Security Researcher</p>
+
+<h2>Target</h2>
+<div class="box">
+https://bkd.malukuprov.go.id/detail.aspx?id=85
+</div>
+
+<h2>Awal Penemuan</h2>
+<p>
+Pengujian dimulai ketika saya melakukan eksplorasi pada halaman publik dari situs BKD Maluku Provinsi.
+Salah satu parameter yang menarik perhatian adalah <code>id</code> pada endpoint detail konten.
+</p>
+
+<p>
+Secara struktur, parameter tersebut terlihat sederhana dan umum digunakan sebagai identifier.
+Namun, dari sudut pandang keamanan, parameter seperti ini sering kali menjadi titik awal untuk pengujian lebih lanjut.
+</p>
+
+<h2>Proses Pengujian</h2>
+<p>
+Pengujian dilakukan secara manual dengan pendekatan observasi terhadap respons sistem.
+Saya mencoba memahami bagaimana aplikasi memproses input yang diberikan melalui URL.
+</p>
+
+<p>
+Saat parameter dimodifikasi, ditemukan adanya perubahan perilaku pada respons server.
+Hal ini menjadi indikasi awal bahwa input kemungkinan langsung diproses oleh query backend tanpa validasi yang kuat.
+</p>
+
+<h2>Analisis Teknis</h2>
+<p>
+Setelah dilakukan beberapa percobaan lanjutan, ditemukan indikasi bahwa sistem menggunakan database berbasis SQL Server.
+Dalam kondisi tertentu, sistem juga memberikan error yang mengarah pada struktur internal database.
+</p>
+
+<p>
+Meskipun informasi yang muncul sangat terbatas dan tidak dieksploitasi lebih jauh,
+hal tersebut cukup untuk mengonfirmasi adanya potensi SQL Injection.
+</p>
+
+<h2>Payload Pengujian</h2>
+<div class="box">
+id=85' AND 4827=(SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) AND 'jenx'='jenx
+</div>
+
+<h2>Dampak Potensial</h2>
+<p>
+Jika kerentanan ini dimanfaatkan oleh pihak yang tidak bertanggung jawab, maka dampaknya bisa cukup serius.
+</p>
+
+<ul>
+<li>Pengungkapan data dari database</li>
+<li>Enumerasi struktur database internal</li>
+<li>Manipulasi atau modifikasi data</li>
+<li>Akses tidak sah ke sistem backend</li>
+<li>Potensi eskalasi ke level administratif</li>
+</ul>
+
+<h2>Proof of Concept</h2>
+<p>
+Berikut adalah bukti pengujian yang menunjukkan adanya perubahan perilaku sistem saat payload dijalankan:
+</p>
+
+<img src="proof.png" alt="Proof of Concept SQL Injection">
+
+<h2>Rekomendasi</h2>
+<p>
+Untuk mencegah kerentanan serupa di masa mendatang, beberapa langkah berikut disarankan:
+</p>
+
+<ul>
+<li>Menggunakan prepared statement atau parameterized query</li>
+<li>Melakukan validasi input secara ketat pada parameter <code>id</code></li>
+<li>Menonaktifkan pesan error detail di lingkungan production</li>
+<li>Melakukan audit keamanan secara berkala</li>
+<li>Mengimplementasikan Web Application Firewall (WAF)</li>
+</ul>
+
+<h2>Penutup</h2>
+<p>
+Temuan ini menunjukkan bahwa bahkan parameter sederhana dapat menjadi titik masuk yang berbahaya jika tidak diamankan dengan benar.
+Pendekatan eksplorasi manual sangat membantu dalam mengidentifikasi celah yang sering terlewat oleh pengembang.
+</p>
+
+<p>
+Kerentanan ini telah ditemukan melalui pengujian terbatas dan disusun sebagai bagian dari praktik responsible disclosure.
+</p>
+
+</div>
+
+</body>
+</html>

@@ -90,6 +90,11 @@ nav a:hover {
     gap: 20px;
 }
 
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
 .card {
     background: #111;
     padding: 25px;
@@ -124,20 +129,20 @@ footer {
 </nav>
 
 <section class="hero">
-    <h2>Web Security Researcher</h2>
+    <h2>BUG HUNTER</h2>
     <p>
         I analyze web applications, discover vulnerabilities, and document real-world security issues.
-        Focused on bug hunting, exploitation, and understanding how systems break.
+        Focused on bug hunting and understanding how systems break.
     </p>
     <a href="#writeups" class="btn">View Writeups</a>
 </section>
 
 <section class="section" id="about">
-    <h2>About Me</h2>
+    <h2>TENTANG SAYA</h2>
     <p>
-        I focus on web application security, exploring vulnerabilities such as IDOR,
-        SQL Injection, and misconfigurations. My approach is hands-on, combining labs,
-        CTF challenges, and real-world testing.
+        Saya adalah bug bounty hunter yang tertarik pada dunia keamanan web dan eksploitasi kerentanan. 
+        Saya senang mengeksplorasi bagaimana sistem bekerja dan bagaimana celah keamanan bisa ditemukan serta diperbaiki.
+        Selain belajar secara mandiri, saya juga aktif berkontribusi dan mengikuti perkembangan keamanan siber, termasuk komunitas CSIRT Indonesia.
     </p>
 </section>
 
@@ -145,20 +150,28 @@ footer {
     <h2>Writeups</h2>
 
     <div class="grid">
-        <div class="card">
-            <h3>Improper Authorization</h3>
-            <p>Bypassing premium access control.</p>
-        </div>
 
-        <div class="card">
-            <h3>SQL Injection</h3>
-            <p>Database exposure via vulnerable parameter.</p>
-        </div>
+        <a href="writeup/apel.html" class="card-link">
+            <div class="card">
+                <h3>SQL INJECTION</h3>
+                <p>Sql Injection di website UKRIM.</p>
+            </div>
+        </a>
 
-        <div class="card">
-            <h3>Cloudflare Misconfig</h3>
-            <p>Accessing restricted resources.</p>
-        </div>
+        <a href="writeups/sqli-ukrim.html" class="card-link">
+            <div class="card">
+                <h3>SQL Injection</h3>
+                <p>Database exposure via vulnerable parameter.</p>
+            </div>
+        </a>
+
+        <a href="writeups/cloudflare.html" class="card-link">
+            <div class="card">
+                <h3>Cloudflare Misconfig</h3>
+                <p>Accessing restricted resources.</p>
+            </div>
+        </a>
+
     </div>
 
 </section>

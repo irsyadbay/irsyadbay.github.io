@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Injection - UKRIM</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #0b0b0f;
+    color: #eaeaea;
+    line-height: 1.7;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 60px 20px;
+}
+
+h1 {
+    color: #00ffcc;
+}
+
+h2 {
+    margin-top: 50px;
+    color: #00aaff;
+}
+
+p {
+    color: #ccc;
+}
+
+.box {
+    background: #111;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #1f1f1f;
+    margin-top: 15px;
+    word-break: break-all;
+}
+
+code {
+    background: #111;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+a {
+    color: #00ffcc;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 30px;
+    color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<a href="../index.html" class="back">← Back to Home</a>
+
+<h1>SQL Injection pada Website Program Studi TI UKRIM</h1>
+<p><strong>Irsyad Bayu Kurniawan</strong> — Web Security Researcher</p>
+
+<h2>Target</h2>
+<div class="box">
+<a href="https://www.ti.ukrimuniversity.ac.id/berita.php?id_konten=214" target="_blank">
+https://www.ti.ukrimuniversity.ac.id/berita.php?id_konten=214
+</a>
+</div>
+
+<h2>Awal Cerita</h2>
+<p>
+Semua berawal dari pengamatan sederhana terhadap struktur URL pada halaman berita.
+Parameter <code>id_konten</code> terlihat seperti identifier biasa, namun menjadi titik awal eksplorasi.
+</p>
+
+<p>
+Pengujian dilakukan secara manual tanpa tools otomatis, dengan fokus memahami bagaimana sistem memproses input dari pengguna.
+</p>
+
+<h2>Titik Kecurigaan</h2>
+<p>
+Saat nilai parameter dimodifikasi, respons halaman menunjukkan perilaku yang tidak konsisten.
+Perubahan ini mengindikasikan bahwa input kemungkinan tidak divalidasi dengan baik oleh sistem.
+</p>
+
+<div class="box">
+/berita.php?id_konten=214
+</div>
+
+<h2>Analisis Teknis</h2>
+<p>
+Pengujian lebih lanjut menunjukkan bahwa input pengguna diproses langsung oleh query backend.
+Tidak ditemukan mekanisme validasi atau sanitasi yang memadai.
+</p>
+
+<p>
+Dalam beberapa kondisi, sistem menampilkan error database yang mengarah pada penggunaan MariaDB
+serta memperlihatkan sebagian struktur internal (disamarkan):
+</p>
+
+<div class="box">
+MariaDB 10.x.x<br>
+inf*******_schema<br>
+ukr******_coba<br>
+ukr******_it<br>
+ukr******@localhost
+</div>
+
+<h2>Dampak</h2>
+<p>
+Kerentanan ini berpotensi memberikan dampak signifikan terhadap sistem:
+</p>
+
+<ul>
+<li>Akses tidak sah ke data sensitif</li>
+<li>Manipulasi atau penghapusan data</li>
+<li>Kemungkinan eskalasi akses</li>
+</ul>
+
+<h2>Rekomendasi</h2>
+<ul>
+<li>Menggunakan prepared statement / parameterized query</li>
+<li>Validasi input bahwa <code>id_konten</code> hanya berupa angka</li>
+<li>Menonaktifkan error database di environment production</li>
+</ul>
+
+<h2>Penutup</h2>
+<p>
+Temuan ini menunjukkan bahwa parameter sederhana dapat menjadi titik masuk serangan serius jika tidak divalidasi dengan baik.
+Pendekatan manual dan analisis mendalam membantu mengidentifikasi celah yang sering terlewat.
+</p>
+
+<p>
+Kerentanan telah dilaporkan dan menunggu tindak lanjut dari pihak terkait.
+</p>
+
+</div>
+
+</body>
+</html>

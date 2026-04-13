@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDOR - Data Exposure on Registration System</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --text: #e0e0e0;
+    --muted: #888888;
+    --accent: #00cc66;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.8;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 80px 20px;
+}
+
+h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    margin-top: 60px;
+    color: var(--accent);
+    font-size: 22px;
+}
+
+p {
+    color: var(--muted);
+    margin-top: 15px;
+}
+
+ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 8px;
+    color: var(--muted);
+}
+
+.box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-top: 15px;
+    word-break: break-all;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 40px;
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.back:hover {
+    color: var(--accent);
+}
+
+.video-wrapper {
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    background: #000;
+}
+
+iframe {
+    width: 100%;
+    height: 480px;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<a href="../index.html" class="back">← Back</a>
+
+<h1>IDOR - Unauthorized Access to User Data</h1>
+<p><strong>Irsyad Bayu Kurniawan</strong> — Web Security Researcher</p>
+
+<h2>Target</h2>
+<div class="box">
+Method: POST<br>
+Endpoint: /newdaftar/get_all_data<br>
+Host: https://apply.dinus.ac.id
+</div>
+
+<h2>Ringkasan</h2>
+<p>
+Dalam pengujian lanjutan terhadap sebuah sistem pendaftaran online, ditemukan kembali
+kerentanan dengan pola yang serupa, yaitu <strong>Insecure Direct Object Reference (IDOR)</strong>.
+Kerentanan ini memungkinkan pengguna untuk mengakses data pribadi pengguna lain hanya dengan
+memodifikasi parameter sederhana pada request.
+</p>
+
+<p>
+Temuan ini menunjukkan adanya kelemahan fundamental dalam mekanisme otorisasi di sisi server,
+yang seharusnya menjadi lapisan utama dalam melindungi data pengguna.
+</p>
+
+<div class="box">
+Severity: High
+</div>
+
+<h2>Affected Endpoint</h2>
+<div class="box">
+POST /newdaftar/get_all_data
+</div>
+
+<h2>Awal Penemuan</h2>
+<p>
+Pengujian dimulai saat melakukan eksplorasi terhadap fitur pendaftaran dan pengambilan data user.
+Setelah data berhasil disimpan, sistem menghasilkan sebuah ID unik yang digunakan untuk
+mengambil kembali data tersebut.
+</p>
+
+<p>
+Pada tahap ini, muncul pertanyaan penting:
+apakah sistem benar-benar memverifikasi kepemilikan ID tersebut?
+</p>
+
+<p>
+Untuk menjawab hal ini, dilakukan pengujian menggunakan intercept proxy untuk melihat
+bagaimana request dikirim ke server dan bagaimana sistem merespons.
+</p>
+
+<h2>Analisis Teknis</h2>
+<p>
+Request yang dikirim ke server memiliki parameter sederhana:
+</p>
+
+<div class="box">
+id=139116
+</div>
+
+<p>
+Parameter ini digunakan oleh sistem untuk mengambil seluruh data user terkait.
+Namun, tidak ditemukan adanya validasi apakah ID tersebut milik user yang sedang login.
+</p>
+
+<p>
+Ketika nilai ID diubah menjadi:
+</p>
+
+<div class="box">
+id=139117
+</div>
+
+<p>
+Server tetap mengembalikan data, meskipun ID tersebut milik user lain.
+Hal ini mengindikasikan bahwa sistem sepenuhnya mempercayai input dari client.
+</p>
+
+<h2>Proof of Concept</h2>
+<p>
+Berikut demonstrasi eksploitasi kerentanan:
+</p>
+
+<div class="video-wrapper">
+<iframe src="https://drive.google.com/file/d/1YkHegykDwWHGGooy8YUlPHmW7SVXp5ce/preview" allow="autoplay"></iframe>
+</div>
+
+<p style="font-size:13px; color:#666;">
+PoC: Data exposure via ID manipulation
+</p>
+
+<h2>Langkah Eksploitasi</h2>
+<ul>
+<li>Melakukan input data melalui form pendaftaran</li>
+<li>Sistem menghasilkan ID unik (contoh: 139116)</li>
+<li>Intercept request menggunakan proxy (Burp Suite)</li>
+<li>Mengubah parameter ID ke milik user lain</li>
+<li>Mengirim ulang request ke server</li>
+<li>Server tetap mengembalikan data korban</li>
+</ul>
+
+<h2>Dampak</h2>
+<ul>
+<li>Akses tidak sah ke data pribadi (PII)</li>
+<li>Kebocoran email dan nomor telepon</li>
+<li>Eksposur data keluarga dan dokumen</li>
+<li>Enumerasi massal data user (ID incremental)</li>
+<li>Pelanggaran privasi yang serius</li>
+</ul>
+
+<h2>Akar Masalah</h2>
+<p>
+Masalah utama terletak pada tidak adanya kontrol otorisasi di sisi server.
+Sistem hanya menggunakan parameter ID tanpa melakukan verifikasi apakah
+user memiliki hak akses terhadap resource tersebut.
+</p>
+
+<p>
+Selain itu, penggunaan ID incremental membuat eksploitasi menjadi jauh lebih mudah,
+karena attacker dapat melakukan enumerasi dengan hanya menambah atau mengurangi angka.
+</p>
+
+<h2>Insight & Pembelajaran</h2>
+<p>
+Dari kasus ini, terdapat beberapa hal penting yang dapat dipelajari:
+</p>
+
+<ul>
+<li>ID bukanlah mekanisme keamanan</li>
+<li>Authorization harus selalu dilakukan di server, bukan client</li>
+<li>Data sensitif membutuhkan proteksi berlapis</li>
+<li>ID incremental meningkatkan risiko eksploitasi massal</li>
+</ul>
+
+<p>
+Temuan ini juga memperkuat bahwa banyak aplikasi masih mengabaikan prinsip dasar keamanan,
+terutama pada bagian kontrol akses.
+</p>
+
+<h2>Rekomendasi</h2>
+<ul>
+<li>Validasi bahwa ID milik user yang sedang login</li>
+<li>Gunakan session-based authorization</li>
+<li>Implementasi access control di setiap endpoint sensitif</li>
+<li>Gunakan UUID untuk mencegah enumerasi</li>
+<li>Tambahkan logging aktivitas mencurigakan</li>
+</ul>
+
+<h2>Kesimpulan</h2>
+<p>
+Kerentanan ini memungkinkan akses data pengguna lain tanpa izin hanya dengan
+memodifikasi parameter sederhana pada request.
+</p>
+
+<p>
+Perbaikan segera sangat diperlukan untuk melindungi data pengguna dan menjaga
+integritas sistem dari potensi penyalahgunaan lebih lanjut.
+</p>
+
+</div>
+
+</body>
+</html>

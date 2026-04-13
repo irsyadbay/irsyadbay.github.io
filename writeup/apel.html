@@ -3,76 +3,126 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SQL Injection - UKRIM</title>
+<title>SQL Injection - UKRIM | IrsyadBay</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: #0b0b0f;
-    color: #eaeaea;
-    line-height: 1.7;
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg:#0a0a0a;
+    --surface:#111;
+    --border:#222;
+    --text:#e0e0e0;
+    --muted:#888;
+    --accent:#00cc66;
 }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 60px 20px;
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    line-height:1.8;
 }
 
-h1 {
-    color: #00ffcc;
+/* NAV */
+nav{
+    position:sticky;
+    top:0;
+    background:rgba(10,10,10,0.95);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+    padding:20px 60px;
+    display:flex;
+    justify-content:space-between;
 }
 
-h2 {
-    margin-top: 50px;
-    color: #00aaff;
+nav h1{
+    font-family:'Space Grotesk',sans-serif;
 }
 
-p {
-    color: #ccc;
+nav a{
+    color:var(--muted);
+    margin-left:30px;
+    text-decoration:none;
 }
 
-.box {
-    background: #111;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #1f1f1f;
-    margin-top: 15px;
-    word-break: break-all;
+nav a:hover{color:var(--accent);}
+
+/* CONTENT */
+.container{
+    max-width:800px;
+    margin:auto;
+    padding:80px 20px;
 }
 
-code {
-    background: #111;
-    padding: 4px 8px;
-    border-radius: 6px;
+h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:42px;
+    margin-bottom:20px;
 }
 
-a {
-    color: #00ffcc;
-    text-decoration: none;
+h2{
+    margin-top:60px;
+    margin-bottom:15px;
+    font-size:22px;
+    color:var(--accent);
 }
 
-a:hover {
-    text-decoration: underline;
+p{
+    color:var(--muted);
+    margin-bottom:18px;
 }
 
-.back {
-    display: inline-block;
-    margin-bottom: 30px;
-    color: #aaa;
+.box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:18px;
+    margin:20px 0;
+    font-size:14px;
+    overflow:auto;
+}
+
+ul{
+    margin-left:20px;
+    color:var(--muted);
+}
+
+li{margin-bottom:10px;}
+
+a{
+    color:var(--accent);
+    text-decoration:none;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:40px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
 }
 </style>
 </head>
 
 <body>
 
+<nav>
+    <h1>IrsyadBay</h1>
+    <div>
+        <a href="../index.html">Home</a>
+    </div>
+</nav>
+
 <div class="container">
 
-<a href="../index.html" class="back">← Back to Home</a>
-
-<h1>SQL Injection pada Website Program Studi TI UKRIM</h1>
-<p><strong>Irsyad Bayu Kurniawan</strong> — Web Security Researcher</p>
+<h1>SQL Injection pada Website UKRIM</h1>
+<p><strong>Irsyad Bayu Kurniawan</strong> — Bug Hunter</p>
 
 <h2>Target</h2>
 <div class="box">
@@ -81,20 +131,20 @@ https://www.ti.ukrimuniversity.ac.id/berita.php?id_konten=214
 </a>
 </div>
 
-<h2>Awal Cerita</h2>
+<h2>Latar Belakang</h2>
 <p>
-Semua berawal dari pengamatan sederhana terhadap struktur URL pada halaman berita.
-Parameter <code>id_konten</code> terlihat seperti identifier biasa, namun menjadi titik awal eksplorasi.
+Pengujian dimulai dari observasi sederhana terhadap parameter URL pada halaman berita.
+Parameter <code>id_konten</code> terlihat seperti identifier biasa, namun berpotensi menjadi entry point jika tidak divalidasi dengan benar.
 </p>
 
 <p>
-Pengujian dilakukan secara manual tanpa tools otomatis, dengan fokus memahami bagaimana sistem memproses input dari pengguna.
+Pendekatan yang digunakan adalah manual testing, dengan fokus memahami bagaimana sistem memproses input dari pengguna.
 </p>
 
-<h2>Titik Kecurigaan</h2>
+<h2>Identifikasi Awal</h2>
 <p>
-Saat nilai parameter dimodifikasi, respons halaman menunjukkan perilaku yang tidak konsisten.
-Perubahan ini mengindikasikan bahwa input kemungkinan tidak divalidasi dengan baik oleh sistem.
+Saat parameter dimodifikasi, ditemukan perubahan perilaku pada respon aplikasi.
+Hal ini menjadi indikasi bahwa input tidak diproses secara aman.
 </p>
 
 <div class="box">
@@ -103,13 +153,11 @@ Perubahan ini mengindikasikan bahwa input kemungkinan tidak divalidasi dengan ba
 
 <h2>Analisis Teknis</h2>
 <p>
-Pengujian lebih lanjut menunjukkan bahwa input pengguna diproses langsung oleh query backend.
-Tidak ditemukan mekanisme validasi atau sanitasi yang memadai.
+Pengujian lebih lanjut menunjukkan bahwa input dari pengguna langsung dimasukkan ke dalam query backend tanpa sanitasi yang memadai.
 </p>
 
 <p>
-Dalam beberapa kondisi, sistem menampilkan error database yang mengarah pada penggunaan MariaDB
-serta memperlihatkan sebagian struktur internal (disamarkan):
+Dalam kondisi tertentu, sistem menampilkan error database yang memberikan petunjuk terkait teknologi yang digunakan.
 </p>
 
 <div class="box">
@@ -121,34 +169,46 @@ ukr******@localhost
 </div>
 
 <h2>Dampak</h2>
+<ul>
+<li>Akses tidak sah ke data</li>
+<li>Manipulasi atau penghapusan informasi</li>
+<li>Enumerasi database</li>
+<li>Potensi eskalasi akses</li>
+</ul>
+
+<h2>Analisis Risiko</h2>
 <p>
-Kerentanan ini berpotensi memberikan dampak signifikan terhadap sistem:
+SQL Injection merupakan salah satu kerentanan kritikal karena memungkinkan attacker berinteraksi langsung dengan database.
 </p>
 
-<ul>
-<li>Akses tidak sah ke data sensitif</li>
-<li>Manipulasi atau penghapusan data</li>
-<li>Kemungkinan eskalasi akses</li>
-</ul>
+<p>
+Jika dieksploitasi lebih lanjut, attacker dapat melakukan dump database, bypass authentication,
+atau mengubah data penting dalam sistem.
+</p>
 
 <h2>Rekomendasi</h2>
 <ul>
-<li>Menggunakan prepared statement / parameterized query</li>
-<li>Validasi input bahwa <code>id_konten</code> hanya berupa angka</li>
-<li>Menonaktifkan error database di environment production</li>
+<li>Gunakan prepared statement atau parameterized query</li>
+<li>Validasi bahwa parameter <code>id_konten</code> hanya berupa integer</li>
+<li>Nonaktifkan error database di production</li>
+<li>Lakukan audit keamanan berkala</li>
 </ul>
 
-<h2>Penutup</h2>
+<h2>Kesimpulan</h2>
 <p>
-Temuan ini menunjukkan bahwa parameter sederhana dapat menjadi titik masuk serangan serius jika tidak divalidasi dengan baik.
-Pendekatan manual dan analisis mendalam membantu mengidentifikasi celah yang sering terlewat.
+Kerentanan ini menunjukkan bahwa validasi input merupakan aspek penting dalam pengembangan aplikasi web.
+Parameter sederhana dapat menjadi titik masuk serangan serius jika tidak ditangani dengan benar.
 </p>
 
 <p>
-Kerentanan telah dilaporkan dan menunggu tindak lanjut dari pihak terkait.
+Temuan ini disusun sebagai bagian dari responsible disclosure dan tidak disalahgunakan.
 </p>
 
 </div>
+
+<footer>
+© 2026 IrsyadBay • writeups
+</footer>
 
 </body>
 </html>

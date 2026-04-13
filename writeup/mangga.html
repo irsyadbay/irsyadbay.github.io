@@ -3,16 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SQL Injection - BKD Maluku</title>
+<title>SQL Injection pada Situs BKD Maluku Provinsi</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
 <style>
 body {
     margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: #0b0b0f;
-    color: #eaeaea;
-    line-height: 1.8;
+    font-family: 'Share Tech Mono', monospace;
+    background: #060608;
+    color: #d1d1d6;
 }
+
+/* MATRIX */
+#matrix {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    opacity: 0.07;
+}
+
+/* INTRO */
+#intro {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    background: #050506;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.terminal {
+    width: 80%;
+    max-width: 700px;
+    background: #0b0b0d;
+    border: 1px solid #1a1a22;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.cursor::after {
+    content: "_";
+    animation: blink 1s infinite;
+}
+@keyframes blink { 50% {opacity: 0;} }
+
+/* MAIN */
+#main { display: none; position: relative; z-index: 2; }
 
 .container {
     max-width: 900px;
@@ -20,151 +60,203 @@ body {
     padding: 60px 20px;
 }
 
-h1 {
-    color: #00ffcc;
+/* GLITCH */
+.glitch {
+    position: relative;
+}
+.glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    opacity: 0.15;
+}
+.glitch::before {
+    color: #7a3cff;
+    transform: translate(1px,-1px);
+}
+.glitch::after {
+    color: #ff3b3b;
+    transform: translate(-1px,1px);
 }
 
+/* TEXT */
+h1 { font-size: 26px; }
 h2 {
-    margin-top: 50px;
-    color: #00aaff;
+    margin-top: 40px;
+    font-size: 18px;
+    color: #b0b0b8;
+    border-left: 2px solid #2a2a35;
+    padding-left: 10px;
 }
-
-p, li {
-    color: #cfcfcf;
-}
+p, li { color: #b8b8c2; }
 
 .box {
-    background: #111;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #1f1f1f;
-    margin-top: 15px;
-    word-break: break-all;
+    background: #0e0e13;
+    border: 1px solid #1f1f28;
+    padding: 16px;
+    border-radius: 6px;
+    margin-top: 10px;
 }
 
 code {
-    background: #111;
-    padding: 4px 8px;
-    border-radius: 6px;
+    background: #12121a;
+    padding: 3px 6px;
+    border-radius: 4px;
+    color: #c084fc;
 }
 
 img {
     width: 100%;
-    margin-top: 15px;
-    border-radius: 10px;
-    border: 1px solid #222;
+    margin-top: 12px;
+    border-radius: 6px;
+    border: 1px solid #1a1a22;
 }
 
 .back {
-    display: inline-block;
-    margin-bottom: 30px;
-    color: #aaa;
+    color: #888;
     text-decoration: none;
-}
-
-.back:hover {
-    color: #00ffcc;
 }
 </style>
 </head>
 
 <body>
 
+<canvas id="matrix"></canvas>
+
+<!-- INTRO -->
+<div id="intro">
+    <div class="terminal">
+        <span id="typing"></span><span class="cursor"></span>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
 <div class="container">
 
-<a href="../index.html" class="back">← Back to Home</a>
+<a href="../index.html" class="back">← back</a>
 
-<h1>SQL Injection pada Situs BKD Maluku Provinsi</h1>
-<p><strong>Irsyad Bayu Kurniawan</strong> — Web Security Researcher</p>
+<h1 class="glitch" data-text="[SQL Injection] BKD Maluku">
+[SQL Injection] BKD Maluku
+</h1>
+
+<p><strong>Irsyadbay</strong> — </p>BUG HUNTER
+
+<h2>Overview</h2>
+<p>
+Pengujian dilakukan dengan pendekatan observasi manual terhadap parameter publik aplikasi.
+</p>
 
 <h2>Target</h2>
 <div class="box">
 https://bkd.malukuprov.go.id/detail.aspx?id=85
 </div>
 
-<h2>Awal Penemuan</h2>
+<h2>Reconnaissance</h2>
 <p>
-Pengujian dimulai ketika saya melakukan eksplorasi pada halaman publik dari situs BKD Maluku Provinsi.
-Salah satu parameter yang menarik perhatian adalah <code>id</code> pada endpoint detail konten.
+Parameter <code>id</code> teridentifikasi sebagai entry point potensial.
 </p>
 
+<h2>Testing</h2>
 <p>
-Secara struktur, parameter tersebut terlihat sederhana dan umum digunakan sebagai identifier.
-Namun, dari sudut pandang keamanan, parameter seperti ini sering kali menjadi titik awal untuk pengujian lebih lanjut.
+Manipulasi input menghasilkan perubahan response yang mengindikasikan SQL Injection.
 </p>
 
-<h2>Proses Pengujian</h2>
-<p>
-Pengujian dilakukan secara manual dengan pendekatan observasi terhadap respons sistem.
-Saya mencoba memahami bagaimana aplikasi memproses input yang diberikan melalui URL.
-</p>
-
-<p>
-Saat parameter dimodifikasi, ditemukan adanya perubahan perilaku pada respons server.
-Hal ini menjadi indikasi awal bahwa input kemungkinan langsung diproses oleh query backend tanpa validasi yang kuat.
-</p>
-
-<h2>Analisis Teknis</h2>
-<p>
-Setelah dilakukan beberapa percobaan lanjutan, ditemukan indikasi bahwa sistem menggunakan database berbasis SQL Server.
-Dalam kondisi tertentu, sistem juga memberikan error yang mengarah pada struktur internal database.
-</p>
-
-<p>
-Meskipun informasi yang muncul sangat terbatas dan tidak dieksploitasi lebih jauh,
-hal tersebut cukup untuk mengonfirmasi adanya potensi SQL Injection.
-</p>
-
-<h2>Payload Pengujian</h2>
+<h2>Payload</h2>
 <div class="box">
-id=85' AND 4827=(SELECT COUNT(*) FROM sysusers AS sys1,sysusers AS sys2,sysusers AS sys3,sysusers AS sys4,sysusers AS sys5,sysusers AS sys6,sysusers AS sys7) AND 'jenx'='jenx
+id=85' AND 4827=(SELECT COUNT(*) FROM sysusers...)--
 </div>
 
-<h2>Dampak Potensial</h2>
-<p>
-Jika kerentanan ini dimanfaatkan oleh pihak yang tidak bertanggung jawab, maka dampaknya bisa cukup serius.
-</p>
-
+<h2>Impact</h2>
 <ul>
-<li>Pengungkapan data dari database</li>
-<li>Enumerasi struktur database internal</li>
-<li>Manipulasi atau modifikasi data</li>
-<li>Akses tidak sah ke sistem backend</li>
-<li>Potensi eskalasi ke level administratif</li>
+<li>data exposure</li>
+<li>schema enumeration</li>
+<li>unauthorized access</li>
 </ul>
 
-<h2>Proof of Concept</h2>
+<h2>Proof</h2>
+<img src="../img/Screenshot_20231223-105704_2.png">
+<img src="../img/Screenshot_20231223-105704_1.png">
+
+<h2>Conclusion</h2>
 <p>
-Berikut adalah bukti pengujian yang menunjukkan adanya perubahan perilaku sistem saat payload dijalankan:
-</p>
-
-<img src="../img/Screenshot_20231223-105704_2.png" alt="Proof of Concept SQL Injection">
-<img src="../img/Screenshot_20231223-105704_1.png" alt="error sql">
-
-<h2>Rekomendasi</h2>
-<p>
-Untuk mencegah kerentanan serupa di masa mendatang, beberapa langkah berikut disarankan:
-</p>
-
-<ul>
-<li>Menggunakan prepared statement atau parameterized query</li>
-<li>Melakukan validasi input secara ketat pada parameter <code>id</code></li>
-<li>Menonaktifkan pesan error detail di lingkungan production</li>
-<li>Melakukan audit keamanan secara berkala</li>
-<li>Mengimplementasikan Web Application Firewall (WAF)</li>
-</ul>
-
-<h2>Penutup</h2>
-<p>
-Temuan ini menunjukkan bahwa bahkan parameter sederhana dapat menjadi titik masuk yang berbahaya jika tidak diamankan dengan benar.
-Pendekatan eksplorasi manual sangat membantu dalam mengidentifikasi celah yang sering terlewat oleh pengembang.
-</p>
-
-<p>
-Kerentanan ini telah ditemukan melalui pengujian terbatas dan disusun sebagai bagian dari praktik responsible disclosure.
+Input validation yang tidak optimal dapat menjadi entry point kritis.
 </p>
 
 </div>
+</div>
+
+<!-- SOUND -->
+<audio id="typeSound" src="https://www.soundjay.com/mechanical/keyboard-1.mp3"></audio>
+
+<script>
+// ===== TYPING INTRO =====
+const lines = [
+"booting environment...",
+"connecting target...",
+"bkd.malukuprov.go.id",
+"injecting payload...",
+"[+] vulnerability detected",
+"[✓] access granted"
+];
+
+let i=0,j=0;
+const speed=35;
+const sound=document.getElementById("typeSound");
+
+function typeEffect(){
+ if(i<lines.length){
+  if(j<lines[i].length){
+   document.getElementById("typing").innerHTML+=lines[i][j];
+   j++;
+   sound.currentTime=0;
+   sound.play();
+   setTimeout(typeEffect,speed);
+  } else {
+   document.getElementById("typing").innerHTML+="<br>";
+   i++; j=0;
+   setTimeout(typeEffect,300);
+  }
+ } else {
+  setTimeout(()=>{
+   document.getElementById("intro").style.display="none";
+   document.getElementById("main").style.display="block";
+  },700);
+ }
+}
+typeEffect();
+
+// ===== MATRIX =====
+const canvas=document.getElementById("matrix");
+const ctx=canvas.getContext("2d");
+
+canvas.height=window.innerHeight;
+canvas.width=window.innerWidth;
+
+const letters="01";
+const fontSize=14;
+const columns=canvas.width/fontSize;
+const drops=Array(Math.floor(columns)).fill(1);
+
+function draw(){
+ ctx.fillStyle="rgba(0,0,0,0.05)";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ ctx.fillStyle="#888";
+ ctx.font=fontSize+"px monospace";
+
+ for(let i=0;i<drops.length;i++){
+  const text=letters[Math.floor(Math.random()*letters.length)];
+  ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+
+  if(drops[i]*fontSize>canvas.height && Math.random()>0.975)
+   drops[i]=0;
+
+  drops[i]++;
+ }
+}
+setInterval(draw,50);
+</script>
 
 </body>
 </html>

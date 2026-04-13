@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No Rate Limiting - ASM Seclab | IrsyadBay</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg:#0a0a0a;
+    --surface:#111;
+    --border:#222;
+    --text:#e0e0e0;
+    --muted:#888;
+    --accent:#00cc66;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    line-height:1.8;
+}
+
+nav{
+    position:sticky;
+    top:0;
+    background:rgba(10,10,10,0.95);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+    padding:20px 60px;
+    display:flex;
+    justify-content:space-between;
+}
+
+nav h1{
+    font-family:'Space Grotesk',sans-serif;
+}
+
+nav a{
+    color:var(--muted);
+    margin-left:30px;
+    text-decoration:none;
+}
+
+nav a:hover{color:var(--accent);}
+
+.container{
+    max-width:800px;
+    margin:auto;
+    padding:80px 20px;
+}
+
+h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:42px;
+    margin-bottom:20px;
+}
+
+h2{
+    margin-top:60px;
+    margin-bottom:15px;
+    font-size:22px;
+    color:var(--accent);
+}
+
+p{
+    color:var(--muted);
+    margin-bottom:18px;
+}
+
+.box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:18px;
+    margin:20px 0;
+    font-size:14px;
+    overflow:auto;
+}
+
+ul{
+    margin-left:20px;
+    color:var(--muted);
+}
+
+li{margin-bottom:10px;}
+
+footer{
+    text-align:center;
+    padding:40px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <h1>IrsyadBay</h1>
+    <div>
+        <a href="../index.html">Home</a>
+    </div>
+</nav>
+
+<div class="container">
+
+<h1>No Rate Limiting pada Endpoint Registrasi</h1>
+<p><strong>Irsyad Bayu Kurniawan</strong> — Bug Hunter</p>
+
+<h2>Target</h2>
+<div class="box">
+https://asm.seclab.id/api/auth/register
+</div>
+
+<h2>Latar Belakang</h2>
+<p>
+Dalam proses pengujian terhadap fitur registrasi pada aplikasi ASM Seclab, dilakukan analisis terhadap bagaimana sistem menangani request pendaftaran akun baru.
+</p>
+
+<p>
+Fitur registrasi merupakan salah satu komponen penting dalam aplikasi berbasis user,
+karena menjadi entry point utama bagi pengguna untuk mengakses sistem.
+</p>
+
+<h2>Identifikasi Kerentanan</h2>
+<p>
+Saat melakukan pengujian melalui antarmuka web (UI), ditemukan adanya validasi tertentu yang membatasi input pengguna.
+Namun, validasi tersebut ternyata hanya diterapkan pada sisi client.
+</p>
+
+<p>
+Ketika request dikirim langsung ke endpoint API menggunakan metode manual,
+sistem tetap menerima dan memproses data tanpa melakukan validasi tambahan.
+</p>
+
+<p>
+Hal ini menunjukkan bahwa validasi pada sisi server tidak diimplementasikan dengan baik.
+</p>
+
+<h2>Analisis Teknis</h2>
+<p>
+Endpoint registrasi dapat menerima request berulang dalam jumlah besar tanpa adanya mekanisme pembatasan.
+Tidak ditemukan adanya:
+</p>
+
+<ul>
+<li>Rate limiting per IP atau per user</li>
+<li>Delay atau throttling request</li>
+<li>Validasi CAPTCHA</li>
+<li>Verifikasi email setelah registrasi</li>
+</ul>
+
+<p>
+Dengan kondisi ini, attacker dapat dengan mudah mengotomatisasi pembuatan akun menggunakan script sederhana.
+</p>
+
+<h2>Contoh Request</h2>
+<div class="box">
+POST /api/auth/register HTTP/1.1
+Host: asm.seclab.id
+Content-Type: application/json
+
+{
+  "company_name":"test",
+  "email":"random@test.com",
+  "website":"test.com",
+  "phone":"+6281234567890",
+  "country":"INDONESIA"
+}
+</div>
+
+<h2>Hasil Pengujian</h2>
+<p>
+Request dapat dikirim secara berulang dengan variasi email yang berbeda,
+dan seluruh request diproses dengan sukses oleh server.
+</p>
+
+<div class="box">
+{
+  "status": true,
+  "message": "Registration successful"
+}
+</div>
+
+<p>
+Tidak ditemukan batasan jumlah request maupun mekanisme proteksi terhadap abuse.
+</p>
+
+<h2>Dampak</h2>
+<ul>
+<li>Pembuatan akun palsu secara massal</li>
+<li>Pemborosan resource server dan database</li>
+<li>Penyalahgunaan fitur berbasis akun (trial, kredit, dsb)</li>
+<li>Spam terhadap sistem internal</li>
+<li>Penurunan kualitas dan integritas data</li>
+<li>Potensi abuse lanjutan terhadap fitur lain</li>
+</ul>
+
+<h2>Analisis Risiko</h2>
+<p>
+Kerentanan ini termasuk dalam kategori abuse vulnerability,
+di mana sistem tidak memiliki kontrol terhadap jumlah request yang diterima.
+</p>
+
+<p>
+Dalam skenario nyata, attacker dapat memanfaatkan celah ini untuk:
+</p>
+
+<ul>
+<li>Membuat ribuan akun dalam waktu singkat</li>
+<li>Melakukan brute force terhadap sistem lain yang terhubung</li>
+<li>Menyalahgunakan resource backend secara signifikan</li>
+</ul>
+
+<h2>Rekomendasi</h2>
+<ul>
+<li>Menerapkan rate limiting pada endpoint registrasi</li>
+<li>Menambahkan CAPTCHA untuk mencegah bot</li>
+<li>Mewajibkan verifikasi email sebelum aktivasi akun</li>
+<li>Melakukan validasi input pada sisi server</li>
+<li>Menerapkan monitoring terhadap aktivitas abnormal</li>
+</ul>
+
+<h2>Kesimpulan</h2>
+<p>
+Ketiadaan mekanisme pembatasan pada endpoint registrasi membuka peluang besar untuk penyalahgunaan sistem.
+</p>
+
+<p>
+Implementasi kontrol sederhana seperti rate limiting dan verifikasi email
+dapat secara signifikan mengurangi risiko eksploitasi.
+</p>
+
+<p>
+Temuan ini disusun sebagai bagian dari responsible disclosure dan tidak disalahgunakan.
+</p>
+
+</div>
+
+<footer>
+© 2026 IrsyadBay • writeups
+</footer>
+
+</body>
+</html>

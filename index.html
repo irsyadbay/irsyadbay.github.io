@@ -1,234 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IrsyadBay | Bug Hunter</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IrsyadBay | Bug Hunter</title>
 
-        :root {
-            --bg: #0a0a0a;
-            --surface: #111111;
-            --border: #222222;
-            --text: #e0e0e0;
-            --muted: #888888;
-            --accent: #00cc66;
-        }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+:root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --text: #e0e0e0;
+    --muted: #888888;
+    --accent: #00cc66;
+}
 
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'IBM Plex Mono', monospace;
-            line-height: 1.7;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        nav {
-            position: sticky;
-            top: 0;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--border);
-            padding: 22px 80px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-        }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.7;
+}
 
-        nav h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 26px;
-            font-weight: 600;
-            color: #ddd;
-            letter-spacing: -1px;
-        }
+/* NAV */
+nav {
+    position: sticky;
+    top: 0;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 22px 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+}
 
-        nav a {
-            color: var(--muted);
-            text-decoration: none;
-            margin-left: 40px;
-            font-size: 15px;
-            transition: color 0.3s;
-        }
+nav h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: #ddd;
+}
 
-        nav a:hover {
-            color: var(--accent);
-        }
+nav a {
+    color: var(--muted);
+    text-decoration: none;
+    margin-left: 40px;
+    font-size: 15px;
+    transition: 0.3s;
+}
 
-        .hero {
-            height: 85vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 80px;
-            max-width: 1100px;
-        }
+nav a:hover {
+    color: var(--accent);
+}
 
-        .hero h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 68px;
-            font-weight: 600;
-            line-height: 1.1;
-            color: #f0f0f0;
-            margin-bottom: 24px;
-        }
+/* HERO */
+.hero {
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 80px;
+    max-width: 1100px;
+}
 
-        .hero p {
-            max-width: 620px;
-            color: var(--muted);
-            font-size: 18px;
-        }
+.hero h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 68px;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-bottom: 24px;
+}
 
-        .btn {
-            display: inline-block;
-            margin-top: 40px;
-            padding: 14px 32px;
-            border: 1px solid var(--accent);
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
+.hero p {
+    max-width: 620px;
+    color: var(--muted);
+    font-size: 18px;
+}
 
-        .btn:hover {
-            background: var(--accent);
-            color: #0a0a0a;
-        }
+.btn {
+    display: inline-block;
+    margin-top: 40px;
+    padding: 14px 32px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+    transition: 0.3s;
+}
 
-        .section {
-            padding: 110px 80px;
-            border-top: 1px solid var(--border);
-        }
+.btn:hover {
+    background: var(--accent);
+    color: #000;
+}
 
-        .section h2 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 42px;
-            color: #ddd;
-            margin-bottom: 70px;
-            text-align: center;
-        }
+/* SECTION */
+.section {
+    padding: 110px 80px;
+    border-top: 1px solid var(--border);
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 28px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+.section h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 42px;
+    color: #ddd;
+    margin-bottom: 70px;
+    text-align: center;
+}
 
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            padding: 32px;
-            transition: all 0.4s;
-        }
+/* GRID */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
 
-        .card:hover {
-            border-color: var(--accent);
-            transform: translateY(-6px);
-        }
+/* CARD */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    transition: 0.4s;
+}
 
-        .card h3 {
-            color: var(--accent);
-            font-size: 21px;
-            margin-bottom: 14px;
-        }
+.card:hover {
+    border-color: var(--accent);
+    transform: translateY(-6px);
+}
 
-        .card p {
-            color: var(--muted);
-            font-size: 15.5px;
-        }
+.card h3 {
+    color: var(--accent);
+    font-size: 21px;
+    margin-bottom: 14px;
+}
 
-        footer {
-            text-align: center;
-            padding: 60px 20px;
-            border-top: 1px solid var(--border);
-            color: var(--muted);
-            font-size: 14px;
-        }
-    </style>
+.card p {
+    color: var(--muted);
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 60px 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+}
+</style>
 </head>
+
 <body>
 
-    <nav>
-        <h1>IrsyadBay</h1>
-        <div>
-            <a href="#about">About</a>
-            <a href="#writeups">Writeups</a>
-        </div>
-    </nav>
+<nav>
+    <h1>IrsyadBay</h1>
+    <div>
+        <a href="#about">About</a>
+        <a href="#writeups">Writeups</a>
+        <a href="sertifikat/index.html">Certificates</a>
+    </div>
+</nav>
 
-    <section class="hero">
-        <h2>Irsyad Bayu K | BUG HUNTER</h2>
-        <p>I break systems, find vulnerabilities, and document how things fall apart.</p>
-        <a href="#writeups" class="btn">VIEW WRITEUPS</a>
-    </section>
+<section class="hero">
+    <h2>Irsyad Bayu K | BUG HUNTER</h2>
+    <p>I break systems, find vulnerabilities, and document how things fall apart.</p>
+    <a href="#writeups" class="btn">VIEW WRITEUPS</a>
+</section>
 
-    <section class="section" id="about">
-        <h2>TENTANG SAYA</h2>
-        <p style="max-width: 720px; margin: 0 auto; text-align: center; color: var(--muted); font-size: 17px;">
-            Bug bounty hunter yang fokus pada web application security. 
-            Saya mengeksplorasi kerentanan, menganalisis bagaimana sistem bisa diretas, 
-            dan mendokumentasikan temuan-temuan nyata dari dunia nyata.
-        </p>
-    </section>
+<section class="section" id="about">
+    <h2>TENTANG SAYA</h2>
+    <p style="max-width: 720px; margin: auto; text-align: center; color: var(--muted);">
+        Bug bounty hunter yang fokus pada web application security. 
+        Saya mengeksplorasi kerentanan, menganalisis bagaimana sistem bisa diretas, 
+        dan mendokumentasikan temuan nyata dari dunia nyata.
+    </p>
+</section>
 
-    <section class="section" id="writeups">
-        <h2>WRITEUPS</h2>
-        <div class="grid">
-            <a href="writeup/apel.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                    <h3>SQL Injection — UKRIM</h3>
-                    <p>SQL Injection klasik yang berhasil menembus database website UKRIM.</p>
-                </div>
-            </a>
+<section class="section" id="writeups">
+    <h2>WRITEUPS</h2>
 
-             <a href="writeup/idor-di-udinus2.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                    <h3>IDOR - Unauthorized Access to User Data</h3>
-                    <p>IDOR DI SUBDOMAIN UDINUS PART2.</p>
-                </div>
-            </a>
-            
-            <a href="writeup/mangga.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                    <h3>SQL Injection — BKD Maluku</h3>
-                    <p>Error-based dan blind SQL Injection pada sistem BKD Maluku.</p>
-                </div>
-            </a>
-               <a href="writeup/idor-di-udinus.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                    <h3>IDOR</h3>
-                    <p>IDOR DI SUBDOMAIN UDINUS | IrsyadBay.</p>
-                </div>
-            </a>
-            
-            <a href="writeup/pir.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                    <h3>No Rate Limiting</h3>
-                    <p>No Rate Limiting - ASM Seclab | IrsyadBay.</p>
-                </div>
-            </a>
-            
-            <a href="writeup/durian.html" style="text-decoration: none; color: inherit;">
-                <div class="card">
-                    <h3>Misconfiguration — POLRI Subdomain</h3>
-                    <p>.env file terbuka, membocorkan kredensial dan konfigurasi sensitif.</p>
-                </div>
-            </a>
-        </div>
-    </section>
+    <div class="grid">
 
-    <footer>
-        <p>© 2026 IrsyadBay • All exploits reserved in the shadows</p>
-    </footer>
+        <a href="writeup/apel.html">
+            <div class="card">
+                <h3>SQL Injection — UKRIM</h3>
+                <p>SQL Injection klasik yang berhasil menembus database website UKRIM.</p>
+            </div>
+        </a>
+
+        <a href="writeup/idor-di-udinus2.html">
+            <div class="card">
+                <h3>IDOR - Unauthorized Access</h3>
+                <p>IDOR di subdomain UDINUS (Part 2).</p>
+            </div>
+        </a>
+
+        <a href="writeup/mangga.html">
+            <div class="card">
+                <h3>SQL Injection — BKD Maluku</h3>
+                <p>Error-based dan blind SQL Injection.</p>
+            </div>
+        </a>
+
+        <a href="writeup/idor-di-udinus.html">
+            <div class="card">
+                <h3>IDOR</h3>
+                <p>IDOR di subdomain UDINUS.</p>
+            </div>
+        </a>
+
+        <a href="writeup/pir.html">
+            <div class="card">
+                <h3>No Rate Limiting</h3>
+                <p>Mass account creation vulnerability.</p>
+            </div>
+        </a>
+
+        <a href="writeup/durian.html">
+            <div class="card">
+                <h3>Misconfiguration — POLRI</h3>
+                <p>.env exposure pada subdomain.</p>
+            </div>
+        </a>
+
+    </div>
+</section>
+
+<!-- OPTIONAL SECTION -->
+<section class="section" id="certificates">
+    <h2>SERTIFIKAT</h2>
+    <p style="text-align:center; color: var(--muted);">
+        Koleksi sertifikat pembelajaran & pencapaian saya di bidang cybersecurity.
+    </p>
+
+    <div style="text-align:center; margin-top:40px;">
+        <a href="sertifikat/index.html" class="btn">VIEW CERTIFICATES</a>
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 IrsyadBay • All exploits reserved in the shadows</p>
+</footer>
 
 </body>
 </html>

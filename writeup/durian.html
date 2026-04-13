@@ -3,144 +3,217 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>.env Exposure - SubDomain POLRI</title>
+<title>.env Exposure - POLRI | IrsyadBay</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: #0b0b0f;
-    color: #eaeaea;
-    line-height: 1.8;
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg:#0a0a0a;
+    --surface:#111;
+    --border:#222;
+    --text:#e0e0e0;
+    --muted:#888;
+    --accent:#00cc66;
 }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-    padding: 60px 20px;
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Mono',monospace;
+    line-height:1.8;
 }
 
-h1 {
-    color: #00ffcc;
+/* NAV */
+nav{
+    position:sticky;
+    top:0;
+    background:rgba(10,10,10,0.95);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--border);
+    padding:20px 60px;
+    display:flex;
+    justify-content:space-between;
 }
 
-h2 {
-    margin-top: 50px;
-    color: #00aaff;
+nav h1{
+    font-family:'Space Grotesk',sans-serif;
 }
 
-p, li {
-    color: #cfcfcf;
+nav a{
+    color:var(--muted);
+    margin-left:30px;
+    text-decoration:none;
 }
 
-.box {
-    background: #111;
-    padding: 20px;
-    border-radius: 12px;
-    border: 1px solid #1f1f1f;
-    margin-top: 15px;
-    word-break: break-all;
+nav a:hover{color:var(--accent);}
+
+/* CONTENT */
+.container{
+    max-width:800px;
+    margin:auto;
+    padding:80px 20px;
 }
 
-img {
-    width: 100%;
-    margin-top: 15px;
-    border-radius: 10px;
-    border: 1px solid #222;
+h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:42px;
+    margin-bottom:20px;
 }
 
-code {
-    background: #111;
-    padding: 4px 8px;
-    border-radius: 6px;
+h2{
+    margin-top:60px;
+    margin-bottom:15px;
+    font-size:22px;
+    color:var(--accent);
 }
 
-.back {
-    display: inline-block;
-    margin-bottom: 30px;
-    color: #aaa;
-    text-decoration: none;
+p{
+    color:var(--muted);
+    margin-bottom:18px;
 }
 
-.back:hover {
-    color: #00ffcc;
+.box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:18px;
+    margin:20px 0;
+    font-size:14px;
+    overflow:auto;
+}
+
+ul{
+    margin-left:20px;
+    color:var(--muted);
+}
+
+li{margin-bottom:10px;}
+
+img{
+    width:100%;
+    margin:20px 0;
+    border:1px solid var(--border);
+}
+
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:40px;
+    border-top:1px solid var(--border);
+    color:var(--muted);
 }
 </style>
 </head>
 
 <body>
 
+<nav>
+    <h1>IrsyadBay</h1>
+    <div>
+        <a href="../index.html">Home</a>
+    </div>
+</nav>
+
 <div class="container">
 
-<a href="../index.html" class="back">← Back to Home</a>
-
-<h1>Exposed .env File pada Sistem SIHARWAT</h1>
-<p><strong>Irsyad Bayu Kurniawan</strong> — Web Security Researcher</p>
+<h1>.env Exposure pada Subdomain POLRI</h1>
+<p><strong>Irsyad Bayu Kurniawan</strong> — Bug Hunter</p>
 
 <h2>Target</h2>
 <div class="box">
 https://siharwatbbm.restuban.jatim.polri.go.id/.env
 </div>
 
+<h2>Latar Belakang</h2>
+<p>
+Dalam proses enumerasi subdomain dan analisis struktur aplikasi, ditemukan sebuah endpoint yang secara tidak sengaja mengekspos file konfigurasi sensitif.
+</p>
+
+<p>
+File tersebut adalah <b>.env</b>, yang secara umum digunakan untuk menyimpan konfigurasi environment dalam aplikasi berbasis framework modern.
+</p>
+
 <h2>Deskripsi Sistem</h2>
 <p>
-Sistem ini berada pada subdomain resmi <code>polri.go.id</code>, yang menunjukkan bahwa aplikasi ini merupakan bagian dari infrastruktur internal Kepolisian Republik Indonesia, khususnya wilayah Jawa Timur.
+Target berada pada domain resmi instansi pemerintah, yang mengindikasikan bahwa sistem ini merupakan bagian dari infrastruktur operasional internal.
 </p>
 
 <p>
-Aplikasi SIHARWAT diduga merupakan sistem internal yang digunakan untuk kebutuhan operasional atau monitoring di lingkungan instansi.
-Sistem ini seharusnya hanya dapat diakses oleh pihak internal dan tidak diekspos ke publik.
+Aplikasi seperti ini biasanya digunakan untuk kebutuhan monitoring, manajemen data, atau integrasi layanan backend.
 </p>
 
-<h2>Awal Penemuan</h2>
+<h2>Identifikasi Kerentanan</h2>
 <p>
-Saat melakukan pengamatan terhadap struktur server, ditemukan bahwa file <code>.env</code> dapat diakses secara publik tanpa autentikasi.
+Saat mengakses endpoint secara langsung melalui browser, file <code>.env</code> dapat diambil tanpa autentikasi.
 </p>
 
 <p>
-File ini biasanya berisi konfigurasi sensitif seperti kredensial database, API key, serta pengaturan layanan aplikasi.
+Hal ini menunjukkan adanya kesalahan konfigurasi pada web server, di mana file sensitif tidak dibatasi aksesnya.
 </p>
 
-<h2>Analisis Temuan</h2>
+<h2>Isi Sensitif (Umumnya)</h2>
 <p>
-Akses terbuka terhadap file <code>.env</code> merupakan kesalahan konfigurasi serius pada server web.
-Hal ini dapat menyebabkan kebocoran informasi sensitif yang seharusnya tidak tersedia secara publik.
+File <code>.env</code> biasanya berisi:
 </p>
 
-<h2>Dampak Potensial</h2>
 <ul>
-<li>Kebocoran kredensial database</li>
-<li>Akses tidak sah ke sistem backend</li>
-<li>Kompromi API key atau service internal</li>
-<li>Potensi eskalasi ke sistem lain dalam jaringan internal</li>
+<li>Database credentials (DB_HOST, DB_USER, DB_PASS)</li>
+<li>API keys dan secret tokens</li>
+<li>Mail server configuration</li>
+<li>Application secret / encryption key</li>
 </ul>
 
-<h2>Rekomendasi</h2>
+<h2>Dampak</h2>
 <ul>
-<li>Blok akses publik terhadap file <code>.env</code></li>
-<li>Konfigurasi web server (Apache/Nginx) untuk deny access</li>
-<li>Rotasi semua kredensial yang mungkin terdampak</li>
-<li>Pastikan file konfigurasi tidak berada di direktori publik</li>
+<li>Kebocoran kredensial database</li>
+<li>Akses tidak sah ke backend system</li>
+<li>Penyalahgunaan API</li>
+<li>Pivoting ke sistem internal lainnya</li>
 </ul>
 
 <h2>Proof of Concept</h2>
 <p>
-Berikut bukti bahwa file <code>.env</code> dapat diakses langsung melalui browser:
+File dapat diakses langsung melalui browser tanpa autentikasi:
 </p>
 
-<img src="../img/photo_6256023125858389214_y.jpg" alt="Proof of .env exposure">
+<img src="../img/photo_6256023125858389214_y.jpg">
 
-<h2>Penutup</h2>
+<h2>Analisis Teknis</h2>
 <p>
-Temuan ini menunjukkan bahwa kesalahan konfigurasi kecil dapat berdampak besar terhadap keamanan sistem.
-Akses publik terhadap file konfigurasi seperti <code>.env</code> merupakan risiko serius yang harus segera ditangani.
+Kerentanan ini biasanya terjadi karena file konfigurasi berada dalam direktori publik (web root),
+atau tidak adanya aturan pada server untuk memblokir akses ke file tertentu.
 </p>
 
 <p>
-Laporan ini disusun sebagai bagian dari praktik responsible disclosure untuk meningkatkan keamanan sistem.
+Pada server seperti Apache atau Nginx, file dengan ekstensi tertentu seharusnya dibatasi menggunakan konfigurasi deny rule.
+</p>
+
+<h2>Rekomendasi</h2>
+<ul>
+<li>Blok akses publik ke file <code>.env</code></li>
+<li>Pindahkan file konfigurasi ke luar web root</li>
+<li>Gunakan rule deny pada server</li>
+<li>Lakukan rotasi semua kredensial</li>
+<li>Audit konfigurasi server secara berkala</li>
+</ul>
+
+<h2>Kesimpulan</h2>
+<p>
+Kesalahan konfigurasi sederhana seperti ini dapat berdampak besar terhadap keamanan sistem.
+Eksposur file <code>.env</code> memberikan akses langsung ke informasi sensitif yang dapat digunakan untuk kompromi lebih lanjut.
+</p>
+
+<p>
+Temuan ini disusun sebagai bagian dari responsible disclosure dan tidak disalahgunakan.
 </p>
 
 </div>
+
+<footer>
+© 2026 IrsyadBay • writeups
+</footer>
 
 </body>
 </html>

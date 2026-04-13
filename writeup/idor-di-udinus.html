@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDOR - Unauthorized Data Modification</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #222222;
+    --text: #e0e0e0;
+    --muted: #888888;
+    --accent: #00cc66;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    line-height: 1.8;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 80px 20px;
+}
+
+h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    margin-top: 60px;
+    color: var(--accent);
+    font-size: 22px;
+}
+
+p {
+    color: var(--muted);
+    margin-top: 15px;
+}
+
+ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 8px;
+    color: var(--muted);
+}
+
+.box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-top: 15px;
+    word-break: break-all;
+}
+
+.back {
+    display: inline-block;
+    margin-bottom: 40px;
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.back:hover {
+    color: var(--accent);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<a href="../index.html" class="back">← Back</a>
+
+<h1>IDOR - Unauthorized Data Modification</h1>
+<p><strong>Irsyad Bayu Kurniawan</strong> — Web Security Researcher</p>
+
+<h2>Ringkasan</h2>
+<p>
+Dalam pengujian terhadap sebuah aplikasi web, ditemukan kerentanan yang memungkinkan pengguna
+untuk mengubah data milik pengguna lain hanya dengan memodifikasi parameter pada request.
+Kerentanan ini termasuk dalam kategori <strong>Insecure Direct Object Reference (IDOR)</strong>,
+yang terjadi akibat tidak adanya validasi otorisasi di sisi server.
+</p>
+
+<p>
+Tingkat keparahan dari temuan ini dikategorikan sebagai <strong>High</strong> karena berdampak langsung
+pada integritas dan keamanan data pengguna.
+</p>
+
+<h2>Komponen Terdampak</h2>
+<div class="box">
+Endpoint: Update Data / Profil User
+</div>
+
+<h2>Awal Penemuan</h2>
+<p>
+Temuan ini berawal dari eksplorasi sederhana terhadap fitur perubahan data profil.
+Secara umum, fitur ini terlihat normal seperti aplikasi lainnya, di mana pengguna dapat
+mengubah informasi miliknya sendiri.
+</p>
+
+<p>
+Namun, dalam proses pengujian lebih lanjut, muncul kecurigaan bahwa sistem hanya
+mengandalkan parameter yang dikirim dari client tanpa validasi lebih lanjut di server.
+Hal ini menjadi titik awal untuk melakukan pengujian manipulasi request.
+</p>
+
+<h2>Analisis Teknis</h2>
+<p>
+Pada saat melakukan perubahan data, request berhasil diintercept menggunakan tools seperti Burp Suite.
+Dalam request tersebut ditemukan parameter berikut:
+</p>
+
+<div class="box">
+idpencari=401403
+</div>
+
+<p>
+Parameter ini merepresentasikan ID user yang datanya akan diproses oleh server.
+Namun yang menjadi masalah adalah tidak adanya validasi apakah ID tersebut
+benar-benar milik user yang sedang login.
+</p>
+
+<p>
+Dengan mengganti nilai parameter menjadi ID user lain:
+</p>
+
+<div class="box">
+idpencari=401404
+</div>
+
+<p>
+Server tetap memproses request tersebut tanpa penolakan, yang berarti sistem
+sepenuhnya mempercayai input dari client.
+</p>
+
+<h2>Proof of Concept</h2>
+<ul>
+<li>Melakukan perubahan data sebagai user (ID pelaku)</li>
+<li>Intercept request menggunakan proxy</li>
+<li>Mengubah parameter <code>idpencari</code> ke ID user lain</li>
+<li>Mengirim ulang request ke server</li>
+<li>Server merespon berhasil</li>
+<li>Data korban berubah sesuai input penyerang</li>
+</ul>
+
+<div class="box">
+&lt;script&gt;alert('Berhasil mengubah'); history.go(-1);&lt;/script&gt;
+</div>
+
+<h2>Dampak</h2>
+<ul>
+<li>Perubahan data tanpa izin (Unauthorized Data Modification)</li>
+<li>Pelanggaran privasi pengguna</li>
+<li>Potensi pengambilalihan akun (Account Takeover)</li>
+<li>Kerusakan integritas data sistem</li>
+<li>Penyalahgunaan fitur oleh pihak tidak bertanggung jawab</li>
+</ul>
+
+<h2>Akar Masalah</h2>
+<p>
+Akar utama dari kerentanan ini adalah kegagalan dalam menerapkan kontrol otorisasi
+di sisi server. Sistem tidak melakukan verifikasi apakah user yang melakukan request
+memiliki hak akses terhadap resource yang diminta.
+</p>
+
+<p>
+Selain itu, penggunaan parameter ID yang sepenuhnya berasal dari input user tanpa
+validasi memperbesar risiko eksploitasi.
+</p>
+
+<h2>Insight & Pembelajaran</h2>
+<p>
+Dari kasus ini, terdapat beberapa pelajaran penting dalam dunia keamanan aplikasi:
+</p>
+
+<ul>
+<li>Validasi di sisi client tidak pernah cukup — semua harus divalidasi ulang di server</li>
+<li>Setiap request sensitif wajib memiliki pengecekan otorisasi</li>
+<li>ID yang terlihat “sepele” sering menjadi titik masuk serangan</li>
+<li>Tools sederhana seperti proxy sudah cukup untuk menemukan celah serius</li>
+</ul>
+
+<p>
+Kasus ini juga menunjukkan bahwa kerentanan tidak selalu berasal dari sistem yang kompleks.
+Sering kali, kesalahan sederhana dalam desain otorisasi justru menjadi celah terbesar.
+</p>
+
+<h2>Rekomendasi</h2>
+<ul>
+<li>Validasi bahwa user hanya dapat mengakses datanya sendiri</li>
+<li>Gunakan session-based authorization</li>
+<li>Jangan percaya input ID dari client</li>
+<li>Tambahkan logging aktivitas mencurigakan</li>
+<li>Lakukan audit keamanan secara berkala</li>
+</ul>
+
+<h2>Kesimpulan</h2>
+<p>
+Kerentanan ini memungkinkan penyerang untuk memodifikasi data pengguna lain tanpa izin
+hanya dengan mengubah parameter pada request.
+</p>
+
+<p>
+Perbaikan segera diperlukan untuk mencegah penyalahgunaan lebih lanjut dan menjaga
+integritas sistem serta keamanan data pengguna.
+</p>
+
+</div>
+
+</body>
+</html>

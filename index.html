@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irsyad Bayu K — Bug Bounty Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090b0e;
+    --bg2: #0e1117;
+    --bg3: #141820;
+    --accent: #00ff88;
+    --accent2: #ff3366;
+    --accent3: #00ccff;
+    --text: #e8eaf0;
+    --text2: #7a8295;
+    --text3: #3a4055;
+    --border: rgba(0,255,136,0.15);
+    --border2: rgba(0,204,255,0.12);
+    --mono: 'Space Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.5;
+    transition: transform 0.2s, width 0.2s, height 0.2s;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Scanlines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.05) 2px,
+      rgba(0,0,0,0.05) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.5rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    background: rgba(9,11,14,0.85);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 2px;
+  }
+  .nav-logo span { color: var(--text2); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text2);
+    text-decoration: none;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .hero-tag::before {
+    content: '>';
+    color: var(--accent2);
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .hero-name {
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    margin-bottom: 0.5rem;
+  }
+  .hero-name .slash {
+    color: var(--accent);
+    font-weight: 400;
+    font-family: var(--mono);
+  }
+  .hero-handle {
+    font-family: var(--mono);
+    font-size: clamp(1rem, 2.5vw, 1.75rem);
+    color: var(--accent3);
+    margin-bottom: 2rem;
+    letter-spacing: 3px;
+  }
+  .hero-desc {
+    max-width: 560px;
+    font-size: 1.05rem;
+    color: var(--text2);
+    line-height: 1.8;
+    margin-bottom: 3rem;
+    font-family: var(--mono);
+    font-size: 0.85rem;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.9rem 2rem;
+    border: 1px solid;
+    transition: all 0.2s;
+    cursor: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .btn-primary:hover {
+    background: transparent;
+    color: var(--accent);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent3);
+    border-color: var(--accent3);
+  }
+  .btn-secondary:hover {
+    background: var(--accent3);
+    color: var(--bg);
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    position: absolute;
+    bottom: 3rem;
+    left: 4rem;
+    right: 4rem;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    border: 1px solid var(--border);
+    background: var(--border);
+  }
+  .stat-item {
+    background: var(--bg2);
+    padding: 1.5rem 2rem;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+    font-family: var(--mono);
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text2);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 8rem 4rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent2);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 3rem;
+    line-height: 1.1;
+  }
+  .section-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: var(--accent);
+    margin-bottom: 3rem;
+  }
+
+  /* ABOUT */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .about-text p {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--text2);
+    line-height: 2;
+    margin-bottom: 1.5rem;
+  }
+  .about-text .highlight { color: var(--accent); }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .skill-tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent3);
+    border: 1px solid var(--border2);
+    padding: 0.5rem 0.75rem;
+    letter-spacing: 1px;
+    background: rgba(0,204,255,0.04);
+  }
+  .skill-tag::before { content: '# '; color: var(--text3); }
+
+  /* HALL OF FAME */
+  .hof-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .hof-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .hof-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+  }
+  .hof-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .hof-severity {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 0.3rem 0.75rem;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+  }
+  .sev-critical { background: rgba(255,51,102,0.15); color: var(--accent2); border: 1px solid rgba(255,51,102,0.3); }
+  .sev-high { background: rgba(255,136,0,0.12); color: #ff8800; border: 1px solid rgba(255,136,0,0.3); }
+  .sev-medium { background: rgba(255,204,0,0.1); color: #ffcc00; border: 1px solid rgba(255,204,0,0.25); }
+  .hof-company {
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .hof-vuln {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--text2);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+  .hof-reward {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 2px;
+  }
+  .hof-year {
+    position: absolute;
+    bottom: 1.5rem; right: 2rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text3);
+  }
+
+  /* CVE / RESEARCH */
+  .research-list { display: flex; flex-direction: column; gap: 1rem; }
+  .research-item {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2rem;
+    align-items: center;
+    transition: border-color 0.2s;
+  }
+  .research-item:hover { border-color: var(--accent3); }
+  .research-id {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent3);
+    white-space: nowrap;
+  }
+  .research-info h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .research-info p {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text2);
+  }
+  .research-score {
+    font-family: var(--mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-align: right;
+  }
+  .score-9 { color: var(--accent2); }
+  .score-7 { color: #ff8800; }
+  .score-5 { color: #ffcc00; }
+
+  /* WRITEUPS */
+  .writeup-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  .writeup-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    transition: all 0.2s;
+  }
+  .writeup-card:hover { border-color: var(--accent); }
+  .writeup-card::after {
+    content: '→';
+    position: absolute;
+    bottom: 1.5rem; right: 2rem;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+  }
+  .writeup-card:hover::after { transform: translateX(4px); }
+  .writeup-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .writeup-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+  .writeup-desc {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text2);
+    line-height: 1.8;
+  }
+  .writeup-date {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text3);
+    margin-top: 1.5rem;
+  }
+
+  /* CONTACT */
+  .contact-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .contact-info p {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text2);
+    line-height: 2;
+    margin-bottom: 2rem;
+  }
+  .contact-links { display: flex; flex-direction: column; gap: 0.75rem; }
+  .contact-link {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--accent3);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border2);
+    transition: all 0.2s;
+    background: rgba(0,204,255,0.03);
+  }
+  .contact-link:hover {
+    border-color: var(--accent3);
+    background: rgba(0,204,255,0.08);
+  }
+  .contact-link .cl-icon { color: var(--text3); font-size: 0.65rem; letter-spacing: 2px; }
+  .pgp-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text3);
+    line-height: 1.8;
+    white-space: pre;
+    overflow: hidden;
+  }
+  .pgp-box .pgp-header { color: var(--accent); margin-bottom: 0.5rem; display: block; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+  footer p {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--text3);
+    letter-spacing: 2px;
+  }
+  footer .accent { color: var(--accent); }
+
+  /* Terminal animation */
+  .terminal-line {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 1.5s steps(40) forwards;
+  }
+  @keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  /* Glitch effect */
+  .glitch {
+    position: relative;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .glitch::before {
+    color: var(--accent2);
+    animation: glitch1 3s infinite;
+    clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+    transform: translateX(-2px);
+  }
+  .glitch::after {
+    color: var(--accent3);
+    animation: glitch2 3s infinite;
+    clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    transform: translateX(2px);
+  }
+  @keyframes glitch1 {
+    0%, 90%, 100% { transform: translateX(-2px); opacity: 0; }
+    92% { transform: translateX(-4px); opacity: 0.5; }
+    94% { transform: translateX(0); opacity: 0; }
+    96% { transform: translateX(-2px); opacity: 0.7; }
+  }
+  @keyframes glitch2 {
+    0%, 90%, 100% { transform: translateX(2px); opacity: 0; }
+    93% { transform: translateX(4px); opacity: 0.5; }
+    95% { transform: translateX(0); opacity: 0; }
+    97% { transform: translateX(2px); opacity: 0.7; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 1.5rem; }
+    .hero { padding: 7rem 1.5rem 10rem; }
+    .hero-name { font-size: 2.8rem; letter-spacing: -1px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); bottom: 1.5rem; left: 1.5rem; right: 1.5rem; }
+    .about-grid, .contact-wrapper { grid-template-columns: 1fr; gap: 2rem; }
+    .hof-grid { grid-template-columns: 1fr; }
+    .writeup-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 0.75rem; text-align: center; padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <a href="#" class="nav-logo">Irsyad<span>Bay</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#certificates">Certificates</a></li>
+    <li><a href="#writeups">Writeups</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">Bug Bounty Hunter</div>
+  <h1 class="hero-name glitch" data-text="Irsyad Bayu K">
+    <span class="slash">//</span> Irsyad Bayu K
+  </h1>
+  <div class="hero-handle">@irsyad.bay</div>
+  <p class="hero-desc">
+    // Bug bounty hunter yang fokus pada web application security.<br>
+    // Saya mengeksplorasi kerentanan, menganalisis bagaimana sistem bisa diretas,<br>
+    // dan mendokumentasikan temuan nyata dari dunia nyata.
+  </p>
+  <div class="hero-cta">
+    <a href="#writeups" class="btn btn-primary">View Writeups</a>
+    <a href="#contact" class="btn btn-secondary">Contact</a>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="section-tag">// whoami</div>
+  <div class="section-title">Tentang <em>Saya</em></div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Hai! Saya <span class="highlight">Irsyad Bayu K</span>, seorang bug bounty hunter yang fokus pada web application security. Saya mengeksplorasi kerentanan, menganalisis bagaimana sistem bisa diretas, dan mendokumentasikan temuan nyata dari dunia nyata.</p>
+      <p>Saya aktif di berbagai platform bug bounty dan telah menemukan beberapa kerentanan signifikan seperti SQL Injection, IDOR, dan misconfiguration.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATES -->
+<section id="certificates">
+  <div class="section-tag">// certificates/</div>
+  <div class="section-title">Koleksi <em>Sertifikat</em></div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Koleksi sertifikat pembelajaran & pencapaian saya di bidang cybersecurity.</p>
+      <p><a href="sertifikat/index.html" class="btn btn-secondary">VIEW CERTIFICATES</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- WRITEUPS -->
+<section id="writeups" style="background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="section-tag">// writeups/</div>
+  <div class="section-title">Bug Bounty <em>Writeups</em></div>
+  <div class="writeup-grid">
+
+    <div class="writeup-card">
+      <div class="writeup-tag">SQL Injection · High</div>
+      <div class="writeup-title">SQL Injection — UKRIM</div>
+      <div class="writeup-desc">Classical SQL injection vulnerability that successfully breached the UKRIM website database, demonstrating how improper input sanitization can lead to complete database compromise.</div>
+      <div class="writeup-date">// Link: <a href="https://irsyadbay.github.io/writeup/apel.html">Read Full Writeup</a></div>
+    </div>
+
+    <div class="writeup-card">
+      <div class="writeup-tag">IDOR · High</div>
+      <div class="writeup-title">IDOR - Unauthorized Access (Part 2)</div>
+      <div class="writeup-desc">In-depth analysis of IDOR vulnerability in UDINUS subdomain, showing how improper access controls allowed unauthorized access to sensitive user data across multiple endpoints.</div>
+      <div class="writeup-date">// Link: <a href="https://irsyadbay.github.io/writeup/idor-di-udinus2.html">Read Full Writeup</a></div>
+    </div>
+
+    <div class="writeup-card">
+      <div class="writeup-tag">SQL Injection · High</div>
+      <div class="writeup-title">SQL Injection — BKD Maluku</div>
+      <div class="writeup-desc">Dual exploitation of error-based and blind SQL injection techniques in BKD Maluku system, revealing how different SQL injection variants can be chained for maximum impact.</div>
+      <div class="writeup-date">// Link: <a href="https://irsyadbay.github.io/writeup/mangga.html">Read Full Writeup</a></div>
+    </div>
+
+    <div class="writeup-card">
+      <div class="writeup-tag">IDOR · Medium</div>
+      <div class="writeup-title">IDOR di UDINUS</div>
+      <div class="writeup-desc">Comprehensive breakdown of IDOR vulnerability affecting multiple user accounts in UDINUS system, including exploitation methodology and recommended fixes.</div>
+      <div class="writeup-date">// Link: <a href="https://irsyadbay.github.io/writeup/idor-di-udinus.html">Read Full Writeup</a></div>
+    </div>
+
+    <div class="writeup-card">
+      <div class="writeup-tag">Rate Limiting · Medium</div>
+      <div class="writeup-title">No Rate Limiting</div>
+      <div class="writeup-desc">Mass account creation vulnerability due to missing rate limiting controls, allowing automated creation of thousands of fake accounts and potential DoS attacks.</div>
+      <div class="writeup-date">// Link: <a href="https://irsyadbay.github.io/writeup/pir.html">Read Full Writeup</a></div>
+    </div>
+
+    <div class="writeup-card">
+      <div class="writeup-tag">Misconfiguration · High</div>
+      <div class="writeup-title">Misconfiguration — POLRI</div>
+      <div class="writeup-desc">Critical .env file exposure in POLRI subdomain, leaking sensitive configuration data including API keys, database credentials, and internal service endpoints.</div>
+      <div class="writeup-date">// Link: <a href="https://irsyadbay.github.io/writeup/durian.html">Read Full Writeup</a></div>
+    </div>
+
+    <div class="writeup-card">
+      <div class="writeup-tag">Rate Limiting · Medium</div>
+      <div class="writeup-title">No Rate Limit OTP Abuse</div>
+      <div class="writeup-desc">OTP abuse vulnerability in linuxenic.com allowing unlimited SMS requests, potentially leading to financial losses and service disruption for legitimate users.</div>
+      <div class="writeup-date">// Link: <a href="https://irsyadbay.github.io/writeup/linuxenic.html">Read Full Writeup</a></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-tag">// contact.gpg</div>
+  <div class="section-title">Get In <em>Touch</em></div>
+  <div class="contact-wrapper">
+    <div class="contact-info">
+      <p>Tertarik berkolaborasi, diskusi tentang temuan keamanan, atau butuh konsultasi? Jangan ragu untuk menghubungi saya. Saya merespons dalam 24-48 jam.</p>
+      <p>Untuk responsible disclosure atau laporan bug ke program saya, gunakan PGP key di bawah untuk mengenkripsi pesan Anda.</p>
+      <div class="contact-links">
+        <a href="https://instagram.com/irsyad.bay" class="contact-link">
+          <span class="cl-icon">// IG</span>
+          instagram.com/irsyad.bay
+        </a>
+        <a href="https://github.com/irsyadbay" class="contact-link">
+          <span class="cl-icon">// GH</span>
+          github.com/irsyadbay
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 <span class="accent">IrsyadBay</span> • All exploits reserved in the shadows.</p>
+  <p>// <span class="accent">hack ethically</span> // disclose responsibly // keep learning</p>
+</footer>
+
+<script>
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.transform = `translate(${mx - 6}px, ${my - 6}px)`;
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button, .hof-card, .writeup-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.width = '56px';
+      ring.style.height = '56px';
+      ring.style.opacity = '0.8';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+      ring.style.opacity = '0.5';
+    });
+  });
+
+  // Animate stats on scroll
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.stat-num').forEach(el => {
+          const target = el.textContent;
+          const isNum = !isNaN(parseInt(target));
+          if (isNum) {
+            const end = parseInt(target.replace(/\D/g, ''));
+            const prefix = target.includes('$') ? '$' : '';
+            const suffix = target.includes('K') ? 'K' : '';
+            let start = 0;
+            const step = end / 40;
+            const timer = setInterval(() => {
+              start = Math.min(start + step, end);
+              el.textContent = prefix + Math.floor(start) + suffix;
+              if (start >= end) clearInterval(timer);
+            }, 30);
+          }
+        });
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelector('.stats-bar') && observer.observe(document.querySelector('.stats-bar'));
+</script>
+</body>
+</html>
